@@ -1,0 +1,8 @@
+# Evitar subir credenciales sensibles
+documentation/credentials/.env.trazanet-dev
+documentation/credentials/*.env
+documentation/credentials/service-accounts/
+.env
+node_modules/
+dist/
+.DS_Store
