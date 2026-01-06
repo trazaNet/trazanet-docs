@@ -18,9 +18,9 @@ credentials/
 
 ### Supabase
 ```env
-SUPABASE_URL=https://xxx.supabase.co
-SUPABASE_ANON_KEY=eyJxxx...
-SUPABASE_SERVICE_ROLE_KEY=eyJxxx...  # Solo backend
+SUPABASE_URL=https://TU_PROYECTO.supabase.co
+SUPABASE_ANON_KEY=TU_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY=TU_SERVICE_ROLE_KEY  # Solo backend
 ```
 
 ### Base de Datos (conexión directa)
