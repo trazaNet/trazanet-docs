@@ -1,4 +1,4 @@
-# 📋 Guía: Configurar Email Corporativo
+ # 📋 Guía: Configurar Email Corporativo
 
 ## Opción A: Google Workspace (Recomendado)
 
