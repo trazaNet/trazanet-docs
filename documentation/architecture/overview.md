@@ -4,13 +4,13 @@
 
 ```
                            ┌─────────────────────────────────────────┐
-                           │              +CríaUY                     │
-                           │         (Empresa Madre)                  │
+                           │              +CríaUY                    │
+                           │         (Empresa Madre)                 │
                            └─────────────────────────────────────────┘
                                               │
                            ┌──────────────────▼──────────────────┐
-                           │           TrazaNet                   │
-                           │     (Plataforma de Trazabilidad)     │
+                           │           TrazaNet                  │
+                           │     (Plataforma de Trazabilidad)    │
                            └──────────────────┬──────────────────┘
                                               │
           ┌───────────────────────────────────┼───────────────────────────────────┐
@@ -18,12 +18,12 @@
           ▼                                   ▼                                   ▼
 ┌─────────────────┐               ┌─────────────────┐               ┌─────────────────┐
 │  TrazaNet App   │               │  TrazaNet API   │               │  TrazaNet Web   │
-│    (Mobile)     │               │   (Backend)     │               │   (Frontend)    │
+│    (Mobile)     │               │   (Backend)     │               │   (Dashboard)   │
 │                 │               │                 │               │                 │
 │  ┌───────────┐  │               │  ┌───────────┐  │               │  ┌───────────┐  │
 │  │  Flutter  │  │               │  │  Node.js  │  │               │  │ Angular 17│  │
-│  │  BT/BLE   │  │               │  │    or     │  │               │  │ Tailwind  │  │
-│  │  iOS/And  │  │               │  │  Python   │  │               │  │Container  │  │
+│  │  BT/BLE   │  │               │  │TypeScript │  │               │  │ Tailwind  │  │
+│  │  iOS/And  │  │               │  │  Express  │  │               │  │ (Futuro)  │  │
 │  └───────────┘  │               │  └───────────┘  │               │  └───────────┘  │
 └────────┬────────┘               └────────┬────────┘               └────────┬────────┘
          │                                 │                                 │
@@ -47,55 +47,51 @@
 ```
 ┌──────────┐    Bluetooth     ┌──────────┐     API      ┌──────────┐
 │  Lector  │ ───────────────► │   App    │ ───────────► │ Backend  │
-│  RFID    │                  │  Mobile  │              │   API    │
-└──────────┘                  └──────────┘              └────┬─────┘
+│Baqueano  │       BLE        │  Mobile  │    HTTPS     │   API    │
+└──────────┘                  └──────────┘              └───┬──────┘
                                    │                        │
-                                   │ Offline                │
-                                   │ Storage                │
+                                   │ Cache                  │
+                                   │ Local                  │
                                    ▼                        ▼
                               ┌──────────┐            ┌──────────┐
-                              │  SQLite  │            │ Supabase │
-                              │  Local   │ ─────────► │    DB    │
+                              │  Shared  │            │ Supabase │
+                              │  Prefs   │ ─────────► │    DB    │
                               └──────────┘   Sync     └──────────┘
 ```
 
 ## Componentes por Repositorio
 
-### `trazanet-mobile` (Flutter)
-- Conexión Bluetooth con lectores
-- Lectura y parseo de caravanas
-- Storage local (SQLite)
-- Sincronización offline-first
-- Auth via Supabase
+### `trazanet-mobile-new` (Flutter) ✅
 
-### `trazanet-api` (Node.js/Python)
-- REST API para web
-- Lógica de negocio compleja
-- Generación de planillas/reportes
-- Integración con SNIG/DICOSE (futuro)
-- Validaciones y reglas de negocio
+- Conexión Bluetooth BLE con lectores Baqueano
+- Lectura y parseo de caravanas RFID
+- Storage local (SharedPreferences)
+- Cache de lecturas offline
+- Detección de alertas en tiempo real
+- UI con tabs: Resumen, Inventario, Guías, Alertas
 
-### `trazanet-web` (Angular)
+### `trazanet-api-new` (Node.js/TypeScript) ✅
+
+- REST API con Express
+- Swagger para documentación
+- Endpoints: `/lecturas`, `/lotes`, `/animales`, `/alertas`
+- Persistencia de alertas en `alertas_detectadas`
+- Integración con Supabase Admin
+
+### `trazanet-web` (Angular) 📋 Planificado
+
 - Dashboard de gestión
 - Visualización de datos
 - Reportes y estadísticas
 - Admin panel
-- Gestión de usuarios
-
-### `trazanet-infra`
-- Docker Compose local
-- Kubernetes manifests
-- GitHub Actions CI/CD
-- Terraform (futuro)
 
 ## Servicios Cloud
 
-| Servicio | Uso | Tier |
-|----------|-----|------|
-| Supabase | DB, Auth, Storage | Free → Pro |
-| Vercel | Deploy web | Free → Pro |
-| GitHub | Código, CI/CD | Free |
-| Railway/Render | Deploy API | Free → Pro |
+| Servicio | Uso | Estado |
+|----------|-----|--------|
+| Supabase | DB, Auth, Storage | ✅ Producción |
+| Render | Deploy API | ✅ Producción |
+| GitHub | Código, CI/CD | ✅ Activo |
 
 ## Seguridad
 
@@ -104,3 +100,4 @@
 - RLS (Row Level Security) en DB
 - HTTPS everywhere
 - Secrets en variables de entorno
+- CORS configurado en API

@@ -1,35 +1,29 @@
 # 📚 Documentación TrazaNet
 
-Esta carpeta contiene toda la documentación necesaria para entender y desarrollar el proyecto trazaNet.
+Esta carpeta contiene toda la documentación del proyecto TrazaNet.
 
-## 🚀 Guías de Setup (¡Empezá aquí!)
+## 🚀 Estado Actual
 
-| # | Guía | Descripción |
-|---|------|-------------|
-| 1 | [SETUP_EMAIL.md](./SETUP_EMAIL.md) | Configurar email corporativo |
-| 2 | [SETUP_GITHUB.md](./SETUP_GITHUB.md) | Crear organización y repos en GitHub |
-| 3 | [SETUP_SUPABASE.md](./SETUP_SUPABASE.md) | Configurar base de datos |
-| 4 | [MIGRATION_MOBILE.md](./MIGRATION_MOBILE.md) | Migrar bt-test-app al nuevo repo |
+| Componente | Estado | Ubicación |
+|------------|--------|-----------|
+| App Mobile (Flutter) | ✅ Funcional | `trazanet-mobile-new/` |
+| API Backend (Node.js) | ✅ Deployado en Render | `trazanet-api-new/` |
+| Base de Datos | ✅ Supabase Producción | PostgreSQL |
+| Web Dashboard | 📋 Planificado | - |
 
-## 📂 Estructura
+## 📂 Estructura de Documentación
 
 ```
 documentation/
-├── architecture/     # Arquitectura del sistema
-│   ├── overview.md   # Diagramas y visión general
-│   └── project_context.md  # Contexto empresarial
-├── database/         # Esquemas de BD
-│   └── schema.md     # Tablas y RLS
-├── credentials/      # Gestión de secrets
-├── mobile/           # Docs app Flutter
-├── web/              # Docs frontend Angular
-├── infrastructure/   # Docker, K8s (futuro)
-├── legacy/           # Proyectos descartados
-└── templates/        # Archivos base para nuevos repos
-    ├── trazanet-mobile/
-    ├── trazanet-api/
-    ├── trazanet-web/
-    └── trazanet-infra/
+├── architecture/          # Arquitectura del sistema
+│   ├── overview.md        # Diagramas y visión general
+│   └── project_context.md # Contexto empresarial
+├── database/              # Modelo de datos
+│   └── DATA_MODEL_EVOLUTION.md  # Schema y roadmap
+├── api/                   # Documentación API
+├── mobile/                # Docs app Flutter
+├── credentials/           # Gestión de secrets (NO subir)
+└── legacy/                # Proyectos descartados
 ```
 
 ## 🏢 Contexto
@@ -38,24 +32,26 @@ documentation/
 |-------|-------|
 | **Empresa** | +CríaUY |
 | **Producto** | TrazaNet |
-| **Stack** | Flutter + Angular + Node.js + Supabase |
-| **Prioridad** | Mobile primero |
+| **Stack** | Flutter + Node.js + Supabase |
+| **Deploy** | Render (API) + Supabase (DB) |
 
-## 📋 Checklist Rápido
+## 📋 Features Implementadas
 
-### ✅ Ya Tenés
-- [x] Código mobile funcional (bt-test-app)
-- [x] PWA base (trazaMovil) para web
-- [x] Estructura de documentación
-- [x] Templates para nuevos repos
-- [x] Guías paso a paso
+- [x] Lectura RFID via Bluetooth (Baqueano)
+- [x] CRUD de Lotes y Animales
+- [x] Agrupación de lecturas en "Guías"
+- [x] Detección de alertas (cambio_lote, animal_faltante)
+- [x] Persistencia de alertas en `alertas_detectadas`
+- [x] Entrada manual de caravanas
+- [x] Cache local de lecturas
 
-### 🔲 Próximos Pasos
-- [ ] Comprar dominio trazanet.com
-- [ ] Configurar email dev@trazanet.com
-- [ ] Crear GitHub org
-- [ ] Crear repos
-- [ ] Migrar código
+## 🔲 Próximos Pasos
+
+- [ ] Flujo veterinario (trabajos, certificaciones)
+- [ ] Multi-establecimiento
+- [ ] Export SNIG
+- [ ] Web Dashboard
+- [ ] Histórico de peso
 
 ---
 

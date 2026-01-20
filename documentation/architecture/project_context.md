@@ -5,7 +5,7 @@
 | Campo | Valor |
 |-------|-------|
 | **Empresa madre** | +CríaUY |
-| **Producto** | trazaNet |
+| **Producto** | TrazaNet |
 | **País target** | Uruguay |
 | **Industria** | Trazabilidad ganadera |
 
@@ -13,43 +13,55 @@
 
 TrazaNet es una plataforma de trazabilidad ganadera que conecta lectores de caravanas electrónicas con un sistema de gestión de datos. El objetivo es:
 
-1. **Lectura de caravanas** via Bluetooth desde lectores RFID
-2. **Organización de datos** de animales, lotes, movimientos
-3. **Generación de planillas** para trámites oficiales (DICOSE, SNIG, etc.)
+1. **Lectura de caravanas** via Bluetooth desde lectores RFID (Baqueano)
+2. **Organización de datos** de animales, lotes, movimientos y alertas
+3. **Generación de guías** para trámites oficiales (SNIG, DICOSE)
+4. **Detección de alertas** en tiempo real (animal faltante, cambio de lote)
 
 ## Productos
 
-| Nombre | Tipo | Tech Stack | Estado |
-|--------|------|------------|--------|
-| **trazaNet Mobile** | App iOS/Android | Flutter | ✅ Funcional (ex bt-test-app) |
-| **trazaNet Web** | Web App | Angular 17 | 🔄 En desarrollo |
-| **trazaNet API** | Backend | Por definir | 📋 Planificado |
+| Nombre | Tipo | Tech Stack | Estado | Ubicación |
+|--------|------|------------|--------|-----------|
+| **trazaNet Mobile** | App iOS/Android | Flutter | ✅ Funcional | `trazanet-mobile-new/` |
+| **trazaNet API** | Backend | Node.js/TypeScript | ✅ Funcional | `trazanet-api-new/` |
+| **trazaNet Web** | Web App | Angular 17 | 📋 Planificado | - |
 
-## Proyectos Legado (Descartados)
+## Infraestructura Actual
 
-| Nombre | Razón de descarte | Valor rescatable |
-|--------|-------------------|------------------|
-| trazaMovil (PWA) | iOS no permite BT en PWAs | UI/UX, lógica de negocio |
-| GeoMu | No funcional | Diseños de interfaz, mapa |
+| Servicio | Proveedor | Estado |
+|----------|-----------|--------|
+| Base de datos | Supabase (PostgreSQL) | ✅ Producción |
+| API Backend | Render | ✅ Deployado |
+| App Mobile | Local/TestFlight | ✅ En testing |
+
+## Usuarios Target
+
+| Rol | Descripción | Features |
+|-----|-------------|----------|
+| **Productor** | Dueño/encargado de establecimiento | Registro de animales, lotes, estadísticas básicas |
+| **Veterinario** | Profesional certificador | Trabajos veterinarios, certificaciones oficiales (futuro) |
 
 ## Decisiones Técnicas
 
 ### ¿Por qué Flutter para Mobile?
+
 - PWA descartada por limitaciones de Bluetooth en iOS
 - Flutter permite generar .apk y .ipa desde mismo código
-- bt-test-app ya probada exitosamente en iPhone y Android
+- Conexión BLE exitosa con lectores Baqueano
 
 ### ¿Por qué Supabase?
+
 - Requisito del cliente
 - PostgreSQL con API REST automática
 - Auth, Storage, Realtime incluidos
-- Edge Functions para lógica serverless
+- RLS para seguridad a nivel de fila
 
-### ¿Por qué Backend propio además de Supabase?
+### ¿Por qué Node.js para API?
+
 - Mayor control sobre lógica de negocio compleja
-- Integración con APIs externas (SNIG, DICOSE)
-- Generación de reportes/planillas
-- Posibilidad de migrar de Supabase si es necesario
+- Integración futura con APIs externas (SNIG, DICOSE)
+- TypeScript para type safety
+- Express + Swagger para documentación automática
 
 ## Arquitectura Target
 
@@ -62,8 +74,8 @@ TrazaNet es una plataforma de trazabilidad ganadera que conecta lectores de cara
          └───────────┬───────────┘
                      │
               ┌──────▼──────┐
-              │ trazaNet API │
-              │  (Backend)   │
+              │ trazaNet API│
+              │  (Node.js)  │
               └──────┬──────┘
                      │
          ┌───────────┼───────────┐
@@ -76,11 +88,13 @@ TrazaNet es una plataforma de trazabilidad ganadera que conecta lectores de cara
 
 ## Prioridades de Desarrollo
 
-1. **Mobile primero** - La app de lectura es el core del negocio
-2. **Backend API** - Para lógica de negocio y generación de planillas
-3. **Web** - Dashboard de gestión y reportes
+1. ✅ **Mobile** - App de lectura funcional
+2. ✅ **Backend API** - Lógica de negocio y persistencia
+3. 🔄 **Alertas persistentes** - Usando tabla `alertas_detectadas`
+4. 📋 **Web Dashboard** - Gestión desde escritorio
+5. 📋 **Flujo Veterinario** - Certificaciones oficiales
 
 ## Hardware Compatible
 
-- **Lectores BT**: Investigar modelos compatibles (docs en `mobile/bluetooth.md`)
+- **Lectores BT**: Baqueano (protocolo propietario via BLE)
 - **Caravanas RFID**: Estándar Uruguay (ISO 11784/11785)

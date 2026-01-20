@@ -1,93 +1,96 @@
 # 📋 Checklist de Setup - TrazaNet
 
+> **Última actualización**: Enero 2026
+
 Usá este checklist para trackear tu progreso.
 
-## Fase 1: Identidad Digital
+## Fase 1: Identidad Digital ✅
 
-- [ ] **Dominio**
-  - [ ] Registrar `trazanet.com` 
-  - [ ] Verificar que funciona (puede tardar hasta 48hs)
+- [x] **Dominio**
+  - [x] Registrar dominio
+  - [x] Verificar que funciona
 
-- [ ] **Email Corporativo**
-  - [ ] Crear cuenta Google Workspace o Zoho
-  - [ ] Verificar dominio (registro TXT)
-  - [ ] Configurar MX records
-  - [ ] Crear `dev@trazanet.com`
-  - [ ] Crear `admin@trazanet.com`
-  - [ ] Probar envío/recepción de emails
+- [x] **Servicios Cloud**
+  - [x] Cuenta Supabase
+  - [x] Cuenta Render
+  - [x] Cuenta GitHub
 
-## Fase 2: GitHub
+## Fase 2: GitHub ✅
 
-- [ ] **Organización**
-  - [ ] Crear org `trazanet` en GitHub
-  - [ ] Configurar con email `dev@trazanet.com`
+- [x] **Organización**
+  - [x] Repositorios creados
+  - [x] SSH keys configuradas
 
-- [ ] **Git Local**
-  - [ ] Configurar `git config` con email corporativo
-  - [ ] Generar SSH key
-  - [ ] Agregar SSH key a GitHub
-  - [ ] Probar conexión: `ssh -T git@github.com`
+- [x] **Repositorios Activos**
+  - [x] `trazanet-mobile-new` (Flutter)
+  - [x] `trazanet-api-new` (Node.js/TypeScript)
+  - [x] `trazanet-docs-repo` (Documentación)
 
-- [ ] **Repositorios**
-  - [ ] Crear `trazanet-mobile`
-  - [ ] Crear `trazanet-api`
-  - [ ] Crear `trazanet-web`
-  - [ ] Crear `trazanet-infra`
+## Fase 3: Supabase ✅
 
-## Fase 3: Supabase
+- [x] **Proyecto**
+  - [x] Proyecto creado en Supabase
+  - [x] Database Password guardado
+  - [x] URL y keys configuradas
 
-- [ ] **Organización**
-  - [ ] Crear org "TrazaNet" en Supabase
-  - [ ] Usar email `dev@trazanet.com`
+- [x] **Base de Datos**
+  - [x] Tablas principales creadas
+  - [x] RLS policies configuradas
+  - [x] Foreign keys establecidas
 
-- [ ] **Proyecto Dev**
-  - [ ] Crear proyecto `trazanet-dev`
-  - [ ] Guardar Database Password
-  - [ ] Copiar URL y keys
+## Fase 4: Desarrollo ✅
 
-- [ ] **Base de Datos**
-  - [ ] Ejecutar script de creación de tablas
-  - [ ] Configurar RLS policies
-  - [ ] Probar conexión
+- [x] **Mobile App**
+  - [x] Conexión Bluetooth con Baqueano
+  - [x] Lectura de caravanas RFID
+  - [x] CRUD de lotes
+  - [x] Agregar animales manual
+  - [x] Cache local de lecturas
+  - [x] Pantalla de "Guías"
+  - [x] Detección de alertas en tiempo real
 
-## Fase 4: Migración de Código
+- [x] **API Backend**
+  - [x] Express + TypeScript
+  - [x] Swagger documentación
+  - [x] Endpoints de lecturas
+  - [x] Endpoints de lotes
+  - [x] Endpoints de alertas
+  - [x] Deployado en Render
 
-- [ ] **Mobile**
-  - [ ] Clonar repo `trazanet-mobile`
-  - [ ] Copiar código de `bt-test-app`
-  - [ ] Actualizar package identifiers
-  - [ ] Copiar templates (README, .gitignore)
-  - [ ] Commit y push
-  - [ ] Verificar que compila
+## Fase 5: En Progreso 🔄
 
-- [ ] **API**
-  - [ ] Clonar repo `trazanet-api`
-  - [ ] Copiar templates
-  - [ ] Instalar dependencias
-  - [ ] Configurar .env
-  - [ ] Probar que corre
+- [ ] **Alertas Persistentes**
+  - [x] Tabla `alertas_detectadas` en DB
+  - [x] POST `/api/alertas` crea alertas
+  - [x] GET `/api/lotes/:id/alertas` lee de tabla
+  - [ ] UI para resolver alertas
 
-- [ ] **Web** (más adelante)
-  - [ ] Clonar repo `trazanet-web`
-  - [ ] Migrar código de `trazaMovil`
+- [ ] **Flujo Veterinario**
+  - [ ] Tabla `trabajos_veterinarios` integrada
+  - [ ] Tabla `certificaciones` integrada
+  - [ ] UI de formularios
 
-## Fase 5: Infraestructura
+## Fase 6: Futuro 📋
 
-- [ ] **Docker**
-  - [ ] Copiar docker-compose.yml
-  - [ ] Probar `docker-compose up`
+- [ ] **Multi-Establecimiento**
+  - [ ] Integrar tabla `establecimientos`
+  - [ ] Selector de establecimiento en UI
 
-- [ ] **CI/CD**
-  - [ ] Copiar workflows de GitHub Actions
-  - [ ] Configurar secrets en GitHub
-  - [ ] Probar pipeline
+- [ ] **Export SNIG**
+  - [ ] Formato de exportación definido
+  - [ ] Endpoint de generación
+
+- [ ] **Web Dashboard**
+  - [ ] Angular app
+  - [ ] Visualización de datos
+  - [ ] Reportes
 
 ---
 
 ## Notas
 
-Fecha de inicio: _______________
-
-Dominio comprado en: _______________
-
-Email configurado: _______________
+| Hito | Fecha |
+|------|-------|
+| Mobile MVP | ✅ Completado |
+| API MVP | ✅ Completado |
+| Alertas persistentes | 🔄 En progreso |

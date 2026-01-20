@@ -1,131 +1,191 @@
-[Full content of previous file plus new section]
+# Arquitectura de Datos TrazaNet
 
-# Evolución del Modelo de Datos para Ciencia de Datos
+## Visión General
 
-Este documento describe las decisiones de arquitectura de datos tomadas para soportar futuros análisis de ciencia de datos, específicamente en el manejo de Lotes y Lecturas.
+TrazaNet soporta dos flujos de usuario:
 
-## Filosofía: Inmutabilidad e Historial
+- **Productor**: Registro y estadísticas de animales (MVP actual)
+- **Veterinario**: Certificación oficial de lotes (futuro)
 
-Para permitir análisis precisos (ej. ganancia de peso diaria, trazabilidad completa), adoptamos los siguientes principios:
+---
 
-1. **Animal = Entidad Única**: Un animal (caravana) es un registro único en la base de datos.
-2. **Lectura = Evento Inmutable**: Cada interacción con un animal (pesaje, movimiento, tacto) genera una lectura que nunca se elimina.
-3. **Lote = Agrupación Temporal**: Los lotes agrupan lecturas en un periodo de tiempo.
+## Diagrama Entidad-Relación
 
-## Implementación de Soft Delete en Lotes
-
-Para evitar la pérdida de datos históricos cuando un usuario "elimina" un lote de la interfaz, implementamos un mecanismo de **Soft Delete**.
-
-### Esquema de Base de Datos
-
-Se agregaron las siguientes columnas a la tabla `lotes`:
-
-```sql
-ALTER TABLE lotes ADD COLUMN deleted_at TIMESTAMP WITH TIME ZONE;
-ALTER TABLE lotes ADD COLUMN archived BOOLEAN DEFAULT false;
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              USUARIOS                                        │
+│  ┌────────────┐                                                             │
+│  │  perfiles  │                                                             │
+│  └─────┬──────┘                                                             │
+│        │ crea                                                               │
+│        ▼                                                                    │
+│  ┌──────────────────┐          ┌─────────────────────┐                     │
+│  │ establecimientos │          │ trabajos_veterinarios│◀────┐              │
+│  └────────┬─────────┘          └──────────┬──────────┘     │              │
+│           │ contiene                       │ genera         │ realiza      │
+│           ▼                                ▼                │              │
+│     ┌──────────┐                   ┌───────────────┐       │              │
+│     │  lotes   │                   │certificaciones│───────┘              │
+│     └────┬─────┘                   └───────────────┘                      │
+│          │                                                                 │
+└──────────┼─────────────────────────────────────────────────────────────────┘
+           │
+           ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                           CORE - LECTURAS                                  │
+│                                                                            │
+│  ┌──────────┐         ┌──────────────┐         ┌────────────────────┐    │
+│  │  lotes   │◀────────│   lecturas   │────────▶│     animales       │    │
+│  └────┬─────┘         └──────┬───────┘         └─────────┬──────────┘    │
+│       │                      │                           │               │
+│       │                      ▼                           │               │
+│       │         ┌─────────────────────────┐              │               │
+│       └────────▶│   alertas_detectadas    │◀─────────────┘               │
+│                 │  - lote_esperado (FK)   │                              │
+│                 │  - lote_detectado (FK)  │                              │
+│                 │  - animal_id (FK)       │                              │
+│                 └─────────────────────────┘                              │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+           │
+           ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                        EXTENSIONES (FUTURO)                               │
+│                                                                           │
+│  ┌────────────────┐  ┌────────────────┐  ┌─────────────────┐             │
+│  │ peso_animales  │  │ movimientos    │  │ manejos_aplicados│            │
+│  └────────────────┘  └────────────────┘  └─────────────────┘             │
+│                                                                           │
+│  ┌────────────────┐  ┌────────────────┐  ┌─────────────────┐             │
+│  │  diagnosticos  │  │ ubicaciones    │  │   etiquetas     │             │
+│  └────────────────┘  └────────────────┘  └─────────────────┘             │
+│                                                                           │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
-* **`deleted_at`**: Timestamp de eliminación. Si es `NULL`, el lote está activo. Si tiene fecha, está eliminado para el usuario pero disponible para análisis.
-* **`archived`**: Flag para lotes finalizados que se quieren ocultar de la vista principal sin eliminar.
+---
 
-### Comportamiento del API
+## Estado de Uso por Tabla
 
-* **GET `/api/lotes`**: Por defecto retorna solo lotes activos (`deleted_at IS NULL`).
-  * Para análisis de datos, se puede usar `?includeDeleted=true` (a implementar si es necesario, o vía acceso directo a DB).
-* **DELETE `/api/lotes/:id`**: No borra el registro físicamente. Simplemente actualiza `deleted_at = NOW()`.
+| Tabla | Estado | Flujo | Descripción |
+|-------|--------|-------|-------------|
+| `animales` | ✅ Activa | Ambos | Entidad central |
+| `lotes` | ✅ Activa | Ambos | Agrupación de trabajo |
+| `lecturas` | ✅ Activa | Ambos | Eventos de lectura RFID |
+| `alertas_detectadas` | ✅ Activa | Productor | Alertas persistidas |
+| `perfiles` | 🔜 Próximo | Ambos | Auth y roles de usuario |
+| `establecimientos` | 🔜 Próximo | Ambos | Multi-estancia |
+| `trabajos_veterinarios` | 📅 Futuro | Veterinario | Sesiones de certificación |
+| `certificaciones` | 📅 Futuro | Veterinario | Documentos oficiales |
+| `movimientos_animales` | 📅 Futuro | Ambos | Trazabilidad entre lotes |
+| `diagnosticos` | 📅 Futuro | Veterinario | Diagnósticos clínicos |
+| `manejos_aplicados` | 📅 Futuro | Ambos | Tratamientos y acciones |
+| `peso_animales` | 📅 Futuro | Ambos | Histórico de pesajes |
+| `etiquetas*` | 📅 Futuro | Ambos | Sistema de etiquetado |
+| `ubicaciones_animales` | 📅 Futuro | Ambos | GPS tracking |
 
-### Ventajas para Ciencia de Datos
+---
 
-1. **Integridad Referencial**: Las lecturas históricas no quedan "huérfanas" de lote.
-2. **Análisis de Tendencias**: Se pueden analizar datos de lotes antiguos eliminados por el usuario.
-3. **Reversibilidad**: Si un usuario borra un lote por error, se puede restaurar (simplemente seteando `deleted_at = NULL`).
+## Flujo Productor (MVP Actual)
 
-## Tabla `lecturas` y Data Science
-
-Se agregó una columna `datos` de tipo JSONB a la tabla `lecturas` para flexibilizar la captura de variables sin alterar el esquema constantemente:
-
-```sql
-ALTER TABLE lecturas ADD COLUMN datos JSONB;
+```
+  PRODUCTOR                    APP                         API                    DB
+      │                         │                           │                      │
+      │ Crea Lote               │                           │                      │
+      ├────────────────────────▶│                           │                      │
+      │                         │ POST /lotes               │                      │
+      │                         ├──────────────────────────▶│                      │
+      │                         │                           │ INSERT lotes         │
+      │                         │                           ├─────────────────────▶│
+      │                         │                           │                      │
+      │ Escanea caravana        │                           │                      │
+      ├────────────────────────▶│                           │                      │
+      │                         │ POST /lecturas            │                      │
+      │                         ├──────────────────────────▶│                      │
+      │                         │                           │ INSERT animales      │
+      │                         │                           │ (si no existe)       │
+      │                         │                           ├─────────────────────▶│
+      │                         │                           │ INSERT lecturas      │
+      │                         │                           ├─────────────────────▶│
+      │                         │                           │                      │
+      │                         │                           │ ¿Cambio de lote?     │
+      │                         │                           │ INSERT alertas       │
+      │                         │                           ├─────────────────────▶│
+      │                         │                           │                      │
+      │ Ver Guías               │                           │                      │
+      ├────────────────────────▶│ GET /lotes/:id/guias      │                      │
+      │                         ├──────────────────────────▶│                      │
+      │                         │                           │ SELECT lecturas      │
+      │                         │                           │ GROUP BY fecha       │
+      │                         │◀──────────────────────────│◀─────────────────────│
+      │◀────────────────────────│                           │                      │
+      │                         │                           │                      │
 ```
 
-Esto permite guardar métricas variables como:
+---
 
-* Condition corporal
-* Peso
-* Observaciones veterinarias
-* Preñez
+## Schema de Tablas Principales
 
-## Diagrama Conceptual
+### `lecturas`
 
-Estructura de relaciones para análisis de datos:
+| Columna | Tipo | Nullable | Descripción |
+|---------|------|----------|-------------|
+| id | uuid | ❌ | PK auto-generado |
+| animal_id | uuid | ✅ | FK → animales |
+| lector_id | uuid | ✅ | Dispositivo físico (no usado) |
+| trabajo_id | uuid | ✅ | FK → trabajos_veterinarios (futuro) |
+| lote_id | uuid | ✅ | FK → lotes |
+| fecha | timestamp | ✅ | Momento de la lectura |
+| ubicacion | jsonb | ✅ | {lat, lon} GPS |
+| caravana | text | ✅ | Snapshot del código |
+| tipo | text | ✅ | 'manual', 'nfc', etc. |
+| datos | json | ✅ | Notas, condición corporal, etc. |
 
-```mermaid
-graph LR
-    ANIMAL[ANIMAL<br>(entidad única)] <-- (animal_id) --- LECTURA[LECTURA<br>(evento/observación)];
-    LOTE[LOTE<br>(agrupación temporal)] <-- (lote_id) --- LECTURA;
+### `alertas_detectadas`
 
-    classDef default fill:#fff,stroke:#333,stroke-width:1px;
-    class ANIMAL,LECTURA,LOTE default;
-```
+| Columna | Tipo | Nullable | Descripción |
+|---------|------|----------|-------------|
+| id | uuid | ❌ | PK |
+| animal_id | uuid | ✅ | FK → animales |
+| lote_esperado | uuid | ✅ | Donde debería estar |
+| lote_detectado | uuid | ✅ | Donde apareció |
+| tipo | text | ✅ | 'faltante', 'cambio_lote' |
+| motivo | text | ✅ | Descripción legible |
+| fecha | timestamp | ✅ | Cuándo se detectó |
+| resuelto | bool | ✅ | Si ya se atendió |
+| resuelto_por | text | ✅ | Quién lo resolvió |
+| fecha_resuelto | timestamp | ✅ | Cuándo |
+| comentario | text | ✅ | Notas adicionales |
 
-```text
-┌─────────────┐     ┌──────────────┐     ┌─────────────┐
-│   ANIMAL    │     │   LECTURA    │     │    LOTE     │
-│ (entidad    │◄────│ (evento/     │────►│ (agrupación │
-│  única)     │     │  observación)│     │  temporal)  │
-└─────────────┘     └──────────────┘     └─────────────┘
-   ID único          timestamp           fecha_inicio
-   caravana          animal_id           fecha_fin
-   historial         lote_id             estado
-                     tipo_lectura        deleted_at
-                     datos_capturados    
-  - `lectura` (evento/observación):
-    - `id`: uuid (PK)
-    - `fecha`: timestamp with time zone (NOT created_at, NOT fecha_hora)
-    - `animal_id`: uuid (FK -> animales.id)
-    - `lote_id`: uuid (FK -> lotes.id)
-    - `tipo`: text ('manual', 'nfc', etc.)
-    - `caravana`: text (snapshot at reading time)
-    - `ubicacion`: jsonb (lat, lon)   
-```
+---
 
-## Referencia de Esquema: Tabla `lotes`
+## Roadmap de Features
 
-Esquema actual de la tabla `lotes` en Supabase:
+### Fase 1: Productor MVP ✅
 
-| Columna | Tipo | Default | Descripción |
-| :--- | :--- | :--- | :--- |
-| **id** | `uuid` | `gen_random_uuid()` | Identificador único del lote |
-| **nombre** | `text` | `null` | Nombre legible del lote |
-| **establecimiento** | `text` | `null` | Nombre del establecimiento (legacy) |
-| **establecimiento_id** | `uuid` | `null` | FK a tabla establecimientos |
-| **color** | `text` | `null` | Color identificador para UI |
-| **fecha_creacion** | `timestamp` | `now()` | Fecha de creación del registro |
-| **descripcion** | `text` | `null` | Notas adicionales |
-| **tipo_trabajo** | `text` | `null` | Propósito (ej. sanitario, control) |
-| **ubicacion** | `text` | `null` | Ubicación física (potrero) |
-| **finalizado** | `boolean` | `false` | Si el trabajo en el lote concluyó |
-| **fecha_finalizacion** | `timestamp` | `null` | Cuándo se finalizó |
-| **deleted_at** | `timestamp` | `null` | [Soft Delete] Fecha de eliminación |
-| **archived** | `boolean` | `false` | [Soft Delete] Si está archivado |
+- [x] CRUD Lotes
+- [x] Lectura RFID
+- [x] Agregar manual
+- [x] Inventario (animales únicos)
+- [x] Guías (sesiones agrupadas)
+- [x] Alertas persistentes
 
-## Nueva Arquitectura: Lote (Estado) vs Lectura (Evento)
+### Fase 2: Multi-Establecimiento 🔜
 
-Para mejorar la UX y la claridad conceptual, distinguimos explícitamente entre **Inventario** e **Historial**.
+- [ ] Integrar tabla `establecimientos`
+- [ ] Vincular `perfiles` con auth de Supabase
+- [ ] Lotes por establecimiento
 
-### Concepto
+### Fase 3: Flujo Veterinario 📅
 
-* **Lote (Carpeta/Estado)**: Representa el inventario *actual*. "Lo que hay hoy".
-  * Se visualiza en la pestaña **Inventario**.
-  * Muestra lista de animales únicos presentes.
-* **Lectura (Evento/Foto)**: Representa una acción puntual en el tiempo.
-  * Se visualiza en la pestaña **Historial**.
-  * Muestra *sesiones* o *logs de actividad*.
-  * Ejemplos: "Sesión de lectura día X", "Agregado manual de animal Y".
+- [ ] Rol veterinario en `perfiles`
+- [ ] Crear `trabajos_veterinarios`
+- [ ] Vincular lecturas a trabajo
+- [ ] Emitir `certificaciones`
 
-### Estrategia de Agrupación (Historial)
+### Fase 4: Analytics 📅
 
-Como no existe una tabla `sesiones`, el historial se construye virtualmente agrupando `lecturas`:
-
-1. **Agrupación Temporal**: Lecturas realizadas en el mismo rango de tiempo (ej. +/- 1 hora) se consideran una "Sesión".
-2. **Eventos Únicos**: Lecturas manuales o aisladas se muestran como eventos individuales.
+- [ ] Histórico de peso (`peso_animales`)
+- [ ] Tracking GPS (`ubicaciones_animales`)
+- [ ] Movimientos entre lotes (`movimientos_animales`)
+- [ ] Dashboards de estadísticas

@@ -17,6 +17,7 @@ credentials/
 ## Variables de Entorno
 
 ### Supabase
+
 ```env
 SUPABASE_URL=https://TU_PROYECTO.supabase.co
 SUPABASE_ANON_KEY=TU_ANON_KEY
@@ -24,31 +25,45 @@ SUPABASE_SERVICE_ROLE_KEY=TU_SERVICE_ROLE_KEY  # Solo backend
 ```
 
 ### Base de Datos (conexión directa)
+
 ```env
 DATABASE_URL=postgresql://user:pass@host:5432/db
 ```
 
-### APIs Externas
+### API Backend
+
+```env
+PORT=3000
+NODE_ENV=production
+```
+
+### APIs Externas (Futuro)
+
 ```env
 SNIG_API_KEY=xxx
 DICOSE_API_KEY=xxx
 ```
 
-## Cuentas y Servicios
+## Servicios Configurados
 
-| Servicio | Email de cuenta | Propósito |
-|----------|-----------------|-----------|
-| GitHub | pendiente | Código fuente |
-| Supabase | pendiente | Base de datos |
-| Vercel | pendiente | Deploy web |
-| Play Store | pendiente | App Android |
-| App Store | pendiente | App iOS |
-| Dominio | pendiente | trazanet.com |
+| Servicio | Propósito | Estado |
+|----------|-----------|--------|
+| Supabase | Base de datos PostgreSQL | ✅ Configurado |
+| Render | Deploy API | ✅ Configurado |
+| GitHub | Código fuente | ✅ Configurado |
+
+## URLs de Producción
+
+| Servicio | URL |
+|----------|-----|
+| API Backend | `https://trazanet-api.onrender.com` |
+| Supabase | Ver dashboard de Supabase |
 
 ## Buenas Prácticas
 
 1. **Nunca hardcodear** credenciales en código
 2. **Usar .env** para desarrollo local
-3. **Secretos en CI/CD** para deploys (GitHub Secrets, Vercel env vars)
+3. **Secretos en CI/CD** para deploys (GitHub Secrets, Render env vars)
 4. **Rotar keys** periódicamente
 5. **Diferentes keys** por ambiente (dev/staging/prod)
+6. **No commitear** archivos .env al repositorio
