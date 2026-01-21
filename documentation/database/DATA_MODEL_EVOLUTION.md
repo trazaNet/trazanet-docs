@@ -9,24 +9,68 @@ TrazaNet soporta dos flujos de usuario:
 
 ---
 
+## Concepto Clave: Lote vs Guía
+
+> **Esta distinción es fundamental para entender el modelo de datos.**
+
+| Concepto | Definición | Analogía |
+|----------|------------|----------|
+| **Lote** | Contenedor de trabajo | Carpeta de expediente |
+| **Guía** | Sesión de lectura con propósito | Página del expediente |
+
+### ¿Por qué importa?
+
+- **Lote**: Agrupador estático → "Lote Potrero Norte", "Vacas 2026"
+- **Guía**: Sesión dinámica → "Recuento de preñez 20/01", "Vacunación aftosa"
+- El `tipo_trabajo` **debería** estar en la Guía, no en el Lote
+
+### Estado Actual vs Futuro
+
+```
+ACTUAL:                          FUTURO:
+┌─────────────┐                  ┌─────────────┐
+│    Lote     │                  │    Lote     │
+│ tipo_trabajo│ ◀── aquí está    │ (solo meta) │
+└──────┬──────┘                  └──────┬──────┘
+       │                                │
+       ▼                                ▼
+┌─────────────┐                  ┌─────────────┐
+│  Lecturas   │                  │   Guías     │ ◀── tabla nueva
+│ (sin tipo)  │                  │ tipo_trabajo│
+└─────────────┘                  └──────┬──────┘
+                                        │
+                                        ▼
+                                 ┌─────────────┐
+                                 │  Lecturas   │
+                                 └─────────────┘
+```
+
+### Migración Pendiente
+
+1. Crear tabla `guias` con `tipo_trabajo`, `fecha_inicio`, `fecha_fin`
+2. Vincular `lecturas.guia_id` → `guias.id`
+3. Actualizar wizard para crear guía por sesión
+
+---
+
 ## Diagrama Entidad-Relación
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              USUARIOS                                        │
-│  ┌────────────┐                                                             │
-│  │  perfiles  │                                                             │
-│  └─────┬──────┘                                                             │
-│        │ crea                                                               │
-│        ▼                                                                    │
-│  ┌──────────────────┐          ┌─────────────────────┐                     │
-│  │ establecimientos │          │ trabajos_veterinarios│◀────┐              │
-│  └────────┬─────────┘          └──────────┬──────────┘     │              │
-│           │ contiene                       │ genera         │ realiza      │
-│           ▼                                ▼                │              │
-│     ┌──────────┐                   ┌───────────────┐       │              │
-│     │  lotes   │                   │certificaciones│───────┘              │
-│     └────┬─────┘                   └───────────────┘                      │
+┌────────────────────────────────────────────────────────────────────────────┐
+│                              USUARIOS                                      │
+│  ┌────────────┐                                                            │
+│  │  perfiles  │                                                            │
+│  └─────┬──────┘                                                            │
+│        │ crea                                                              │
+│        ▼                                                                   │
+│  ┌──────────────────┐          ┌──────────────────────┐                    │
+│  │ establecimientos │          │ trabajos_veterinarios│◀──┐                │
+│  └────────┬─────────┘          └───────────┬──────────┘    │               │
+│           │ contiene                       │ genera        │ realiza       │
+│           ▼                                ▼               │               │
+│     ┌──────────┐                   ┌───────────────┐       │               │
+│     │  lotes   │                   │certificaciones│───────┘               │
+│     └────┬─────┘                   └───────────────┘                       │
 │          │                                                                 │
 └──────────┼─────────────────────────────────────────────────────────────────┘
            │
