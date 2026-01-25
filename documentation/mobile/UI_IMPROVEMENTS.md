@@ -1,0 +1,30 @@
+# Mobile UI/UX Improvements
+
+## 1. Login Screen Refactor
+
+**Goal:** Enhance perceived quality and prevent layout shifts during interaction.
+
+- **Implemented:** `LayoutBuilder` + `SingleChildScrollView`.
+- **Logic:**
+  - Header (Logo) remains fixed or transitions smoothly using `AnimatedSize`.
+  - Registration fields (DICOSE, Phone) appear via `SizeTransition` without "jumping".
+  - Fade animations for text changes between "Login" and "Register" modes.
+
+## 2. iPhone Navbar Fix (Floating Design)
+
+**Goal:** Fix the "tall navbar" issue on iOS devices with home indicators.
+
+- **Problem:** Embedding `SafeArea` *inside* the navbar container caused the white background to stretch to the bottom of the screen, breaking the floating effect.
+- **Solution:**
+  - Removed internal `SafeArea`.
+  - Applied dynamic margin: `margin-bottom: 20 + MediaQuery.padding.bottom`.
+  - Result: The navbar floats correctly above the home indicator, with transparency below it.
+
+## 3. Lote Detail & Sharing
+
+**Goal:** Clean UI for sharing functionality.
+
+- **Implementation:**
+  - "Share" option is located within the "More Options" menu (3 dots) in the top right.
+  - Tapping opens a bottom sheet with "Compartir Lote" and "Eliminar Lote" options.
+  - This keeps the AppBar clean and groups actionable items logically.
