@@ -28,3 +28,11 @@
   - "Share" option is located within the "More Options" menu (3 dots) in the top right.
   - Tapping opens a bottom sheet with "Compartir Lote" and "Eliminar Lote" options.
   - This keeps the AppBar clean and groups actionable items logically.
+
+## 4. Google Login Button
+
+**Goal:** Premium look & feel for social login.
+
+- **Old:** OutlinedButton with generic icon.
+- **New:** Elevated pill-shaped button (White + Shadow).
+- **Style:** Uses `GoogleFonts.roboto` (w900) to simulate the 'G' logo without external assets, matching brand colors. Text updated to "Continuar con Google".
