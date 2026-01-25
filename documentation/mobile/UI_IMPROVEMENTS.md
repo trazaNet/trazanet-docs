@@ -17,8 +17,9 @@
 - **Problem:** Embedding `SafeArea` *inside* the navbar container caused the white background to stretch to the bottom of the screen, breaking the floating effect.
 - **Solution:**
   - Removed internal `SafeArea`.
-  - Applied dynamic margin: `margin-bottom: 20 + MediaQuery.padding.bottom`.
-  - Result: The navbar floats correctly above the home indicator, with transparency below it.
+  - Applied dynamic margin: `margin-bottom: 8 + MediaQuery.padding.bottom` (Reduced from 20 for a more compact, grounded loook).
+  - Reduced internal padding and spacing to make the bar slimmer.
+  - Result: The navbar floats correctly above the home indicator in a compact form.
 
 ## 3. Lote Detail & Sharing
 
