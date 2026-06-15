@@ -21,9 +21,9 @@
 │    (Mobile)     │               │   (Backend)     │               │   (Dashboard)   │
 │                 │               │                 │               │                 │
 │  ┌───────────┐  │               │  ┌───────────┐  │               │  ┌───────────┐  │
-│  │  Flutter  │  │               │  │  Node.js  │  │               │  │ Angular 17│  │
+│  │  Flutter  │  │               │  │  Node.js  │  │               │  │ Angular 19│  │
 │  │  BT/BLE   │  │               │  │TypeScript │  │               │  │ Tailwind  │  │
-│  │  iOS/And  │  │               │  │  Express  │  │               │  │ (Futuro)  │  │
+│  │  iOS/And  │  │               │  │  Express  │  │               │  │(Funcional)│  │
 │  └───────────┘  │               │  └───────────┘  │               │  └───────────┘  │
 └────────┬────────┘               └────────┬────────┘               └────────┬────────┘
          │                                 │                                 │
@@ -78,7 +78,7 @@
 - Persistencia de alertas en `alertas_detectadas`
 - Integración con Supabase Admin
 
-### `trazanet-web` (Angular) 📋 Planificado
+### `trazanet-web-new` (Angular 19) ✅ Funcional
 
 - Dashboard de gestión
 - Visualización de datos

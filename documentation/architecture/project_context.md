@@ -24,7 +24,7 @@ TrazaNet es una plataforma de trazabilidad ganadera que conecta lectores de cara
 |--------|------|------------|--------|-----------|
 | **trazaNet Mobile** | App iOS/Android | Flutter | ✅ Funcional | `trazanet-mobile-new/` |
 | **trazaNet API** | Backend | Node.js/TypeScript | ✅ Funcional | `trazanet-api-new/` |
-| **trazaNet Web** | Web App | Angular 17 | 📋 Planificado | - |
+| **trazaNet Web** | Web App | Angular 19 | ✅ Funcional | `trazanet-web-new/` |
 
 ## Infraestructura Actual
 
@@ -91,7 +91,7 @@ TrazaNet es una plataforma de trazabilidad ganadera que conecta lectores de cara
 1. ✅ **Mobile** - App de lectura funcional
 2. ✅ **Backend API** - Lógica de negocio y persistencia
 3. 🔄 **Alertas persistentes** - Usando tabla `alertas_detectadas`
-4. 📋 **Web Dashboard** - Gestión desde escritorio
+4. ✅ **Web Dashboard** - Gestión desde escritorio (Angular 19, `trazanet-web-new`)
 5. 📋 **Flujo Veterinario** - Certificaciones oficiales
 
 ## Hardware Compatible

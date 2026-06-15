@@ -4,7 +4,7 @@ Dashboard web para la plataforma de trazabilidad ganadera TrazaNet.
 
 ## 🔧 Tech Stack
 
-- Angular 17+
+- Angular 19+
 - TypeScript
 - Tailwind CSS
 - Supabase
@@ -14,7 +14,7 @@ Dashboard web para la plataforma de trazabilidad ganadera TrazaNet.
 ### Prerrequisitos
 
 - Node.js >= 18
-- Angular CLI >= 17
+- Angular CLI >= 19
 
 ### Instalación
 

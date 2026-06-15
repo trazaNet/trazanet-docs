@@ -1,6 +1,6 @@
 # 💻 TrazaNet Web - Documentación
 
-Portal administrativo de TrazaNet (Angular 17) para gestión centralizada.
+Portal administrativo de TrazaNet (Angular 19) para gestión centralizada.
 
 ## ✨ Características
 *   **Dashboard**: Resumen de animales y lotes.
@@ -9,7 +9,7 @@ Portal administrativo de TrazaNet (Angular 17) para gestión centralizada.
 *   **3D**: Visualizaciones avanzadas con Three.js.
 
 ## 🛠️ Stack Tecnológico
-*   **Framework**: Angular 17 (Standalone)
+*   **Framework**: Angular 19 (Standalone)
 *   **UI**: Tailwind CSS + Material / Custom CSS
 *   **Gráficos**: Chart.js / ng2-charts
 *   **Geolocalización**: Leaflet

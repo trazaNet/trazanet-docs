@@ -111,21 +111,73 @@ Configuración de usuario (auto-detect toggle).
 
 ---
 
-## API Endpoints (pendientes)
+## API Endpoints (implementados)
 
+Todas requieren header `Authorization: Bearer <token>` (Supabase auth) y responden con el
+envelope estándar `{ success: boolean, data?, error?, message? }`. POST exitoso → `201`.
+
+### Toros del lote
 ```
-POST   /api/lotes/:id/toros          - Asignar toro
-DELETE /api/lotes/:id/toros/:toroId  - Desasignar toro
+POST   /api/lotes/:id/toros          - Asignar toro al lote   body { toro_id, notas? }
+GET    /api/lotes/:id/toros          - Listar toros activos del lote (join animales)
+DELETE /api/lotes/:id/toros/:toroId  - Desasignar (soft: activo=false, fecha_retiro)
+```
+
+### Servicios (IA / monta / TE)
+```
 POST   /api/servicios                - Registrar servicio
-POST   /api/partos                   - Registrar parto
-POST   /api/destetes                 - Registrar destete
-GET    /api/animales/:id/genealogia  - Árbol genealógico
-PUT    /api/animales/:id/estado      - Cambiar estado reproductivo
+GET    /api/servicios                - Listar  ?animal_id=&lote_id=&from=&to=
+GET    /api/servicios/:id            - Obtener
+PATCH  /api/servicios/:id            - Actualizar (ej. confirmar preñez)
+DELETE /api/servicios/:id            - Eliminar
 ```
+Body POST: `{ animal_id*, lote_id?, tipo* (inseminacion_artificial|monta_natural|transferencia_embrion), toro_id?, toro_externo_id?, toro_externo_nombre?, toro_externo_raza?, fecha_servicio*, inseminador?, cantidad_dosis?, notas? }`
+
+### Partos
+```
+POST   /api/partos                   - Registrar parto
+GET    /api/partos                   - Listar  ?madre_id=&from=&to=
+GET    /api/partos/:id               - Obtener
+PATCH  /api/partos/:id               - Actualizar
+DELETE /api/partos/:id               - Eliminar
+```
+Body POST: `{ madre_id*, lote_id?, padre_id?, padre_externo_id?, servicio_id?, fecha_parto*, tipo_parto? (normal|distocico|cesarea|aborto|mortinato), cria_id?, cria_caravana?, cria_sexo?, cria_peso_nacimiento?, cantidad_crias?, notas? }`
+
+### Destetes
+```
+POST   /api/destetes                 - Registrar destete
+GET    /api/destetes                 - Listar  ?cria_id=&madre_id=
+GET    /api/destetes/:id             - Obtener
+DELETE /api/destetes/:id             - Eliminar
+```
+Body POST: `{ cria_id*, madre_id?, parto_id?, fecha_destete*, peso_destete?, edad_dias?, lote_destino_id?, notas? }`
+
+### Genealogía y estado (animales)
+```
+GET    /api/animales/:id/genealogia?depth=3  - Árbol ascendente (usa RPC get_ancestors)
+PUT    /api/animales/:id/estado              - Cambio manual de estado reproductivo
+POST   /api/animales/:id/transicionar        - Transición auto por diagnóstico (ya existía)
+```
+`genealogia` devuelve `{ animal, ancestros: [{ id, caravana, sexo, nombre_raza, depth, role, path }] }`.
+`estado` body: `{ categoria_reproductiva?, estado_prenez?, evento? }`; actualiza `animales` y
+audita el cambio en `eventos_reproductivos` (tipo_evento `cambio_manual`).
 
 ---
 
+## Tablas existentes (Supabase)
+
+`servicios`, `partos`, `destetes`, `lote_toros`, `lote_vinculos`, `eventos_reproductivos`,
+`user_settings`, más columnas reproductivas en `animales` y `lotes`.
+
 ## Migraciones SQL
 
-1. `005_create_reproduction_system.sql` - Tablas base
-2. `006_reproductive_categories.sql` - Categorías y settings
+1. `005_create_reproduction_system.sql` - Tablas base (servicios, partos, destetes, lote_toros, vista ranking)
+2. `006_reproductive_categories.sql` - Categorías, lote_vinculos, user_settings, transiciones
+3. `008_recursive_genealogy.sql` - Función `get_ancestors` (genealogía recursiva)
+4. `043_auto_categoria_reproductiva.sql` - eventos_reproductivos, auto-detección y triggers
+5. `049_fix_reproductive_fks.sql` - **Fix de FKs**: `servicios.created_by`, `partos.created_by`,
+   `eventos_reproductivos.created_by` y `user_settings.user_id` estaban como `INTEGER REFERENCES
+   public.users(id)` (tabla legacy). La app inserta el UUID de `auth.users`, así que todo insert
+   fallaba (mismo patrón de bug que tuvo `perfiles`). Esta migración reapunta esas columnas a
+   `auth.users(id)` (UUID) y recrea la vista `vw_historial_categorias` para joinear `perfiles`.
+   ⚠️ Se aplica A MANO en Supabase SQL Editor (el repo API no tiene runner de migraciones).
