@@ -1,7 +1,11 @@
 # Evitar subir credenciales sensibles
+credentials/
 documentation/credentials/.env.trazanet-dev
 documentation/credentials/*.env
 documentation/credentials/service-accounts/
+*.p8
+client_secret_*.json
+*.apps.googleusercontent.com.plist
 .env
 node_modules/
 dist/
